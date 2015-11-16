@@ -124,7 +124,7 @@ int machines_init (machine_t machines[], sensor_t *sensor)
 		machines[i].uuid[36] = '\0';
 		machines[i].current_cur = 0;
 		machines[i].current_threshold = 0;
-		machines[i].current_avgwindow = (double*) malloc (sizeof(double) * window_size);
+		machines[i].current_avgwindow = (cw_t *) malloc (sizeof(cw_t) * window_size);
 		machines[i].size = 0;
 		machines[i].head = 0;
 	}
@@ -176,22 +176,64 @@ int monitor_machine (machine_t *machine)
 	machine->current_threshold = json_object_get_double (tmp);
 	//printf ("machine = %s, current = %f, current_alert = %f\n", machine->uuid, machine->current_cur, machine->current_threshold);
 
+
+	/* Implementation without timestamp for each window entry */
+#if 1 
 	/* send alert if current is greater than threshold */
 	if (machine->current_cur > machine->current_threshold) {
 		int i = 0;
 		double sum = 0, avg = 0;
 	 	for (i = 0; i < machine->size; i++)
-			sum += machine->current_avgwindow[i];
+			sum += machine->current_avgwindow[i].current;
 		if (machine->size != 0)
 			avg = sum / machine->size;	
 		send_alert (machine, avg);
 	}
 
 	/* update the average window */
-	machine->current_avgwindow[machine->head] = machine->current_cur;
+	machine->current_avgwindow[machine->head].current = machine->current_cur;
 	machine->head = (machine->head == window_size - 1) ? 0 : machine->head + 1;
 	if (machine->size < window_size)
 		machine->size++;
+#endif
+
+	/* Implementation with timestamp for each window entry */
+#if 0
+	/* send alert if current is greater than threshold */
+	int64_t timenow = epochtime ();
+	if (machine->current_cur > machine->current_threshold) {
+		int i = 0;
+		double sum = 0, avg = 0;
+		int count = 0;
+		int head_dup = machine->head - 1;
+		if (head_dup < 0) 
+			head_dup = window_size - 1;
+		
+		printf ("head_dup = %d\n", head_dup);
+		while ((machine->current_avgwindow[head_dup].timestamp != 0) && (machine->current_avgwindow[head_dup].timestamp > timenow - seconds_history) && (head_dup != machine->head)) {
+			sum += machine->current_avgwindow[head_dup].current;
+			count++;
+			head_dup -= 1;
+			if (head_dup < 0) 
+				head_dup = window_size - 1;
+		}
+
+		printf ("sum = %f\n", sum);
+		if (count > 0)
+			avg = sum / count;
+		else 
+			avg = machine->current_avgwindow[head_dup].current;
+
+		printf ("avg = %f\n", avg);
+
+		send_alert (machine, avg);
+	}
+	
+	/* update the average window */
+	machine->current_avgwindow[machine->head].current = machine->current_cur;
+	machine->current_avgwindow[machine->head].timestamp = timenow;
+	machine->head = (machine->head == window_size - 1) ? 0 : machine->head + 1;	
+#endif
 
 	/* free memory */
 	json_object_put (jdetail);

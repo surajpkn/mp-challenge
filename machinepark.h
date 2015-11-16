@@ -8,11 +8,16 @@
 #include <uuid/uuid.h>
 #include <time.h>
 
+typedef struct current_window {
+	double 		current;
+	int64_t		timestamp;
+} cw_t;
+
 typedef struct machine {
     char        uuid[37];				/* uuid with a null character */
 	double      current_cur;			/* The current value */
     double      current_threshold;		/* The current threshold */
-    double      *current_avgwindow;		/* A static yet circular buffer using size and head variables */
+    cw_t       *current_avgwindow;		/* A static yet circular buffer using size and head variables */
 	int 		size;					/* The current size of current_avgwindow */
 	int 		head;					/* The current head of current_avgwindow */
 } machine_t;
