@@ -35,21 +35,21 @@ typedef struct MemoryStruct {
  */
 size_t curl_write (void *contents, size_t size, size_t nmemb, void *userp)
 {
-  size_t realsize = size * nmemb;
-  struct MemoryStruct *mem = (struct MemoryStruct *)userp;
+    size_t realsize = size * nmemb;
+    struct MemoryStruct *mem = (struct MemoryStruct *)userp;
 
-  mem->data = realloc(mem->data, mem->size + realsize + 1);
-  if(mem->data == NULL) {
-    /* out of memory! */
-    printf("not enough memory (realloc returned NULL)\n");
-    return 0;
-  }
+    mem->data = realloc(mem->data, mem->size + realsize + 1);
+    if(mem->data == NULL) {
+        /* out of memory! */
+        printf("not enough memory (realloc returned NULL)\n");
+        return 0;
+    }
 
-  memcpy(&(mem->data[mem->size]), contents, realsize);
-  mem->size += realsize;
-  mem->data[mem->size] = 0;
+    memcpy(&(mem->data[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->data[mem->size] = 0;
 
-  return realsize;
+    return realsize;
 }
 
 /* Function to make http request and get data
