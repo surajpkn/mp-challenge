@@ -21,8 +21,8 @@ int window_size;
 
 /* Helper for CURL */
 typedef struct MemoryStruct {
-  char *data;
-  size_t size;
+    char *data;
+    size_t size;
 } chunk_t;
 
 /*******************************************************

@@ -9,24 +9,24 @@
 #include <time.h>
 
 typedef struct current_window {
-	double 		current;
-	int64_t		timestamp;
+    double      current;
+    int64_t     timestamp;
 } cw_t;
 
 typedef struct machine {
-    char        uuid[37];				/* uuid with a null character */
-	double      current_cur;			/* The current value */
-    double      current_threshold;		/* The current threshold */
-    cw_t       *current_avgwindow;		/* A static yet circular buffer using size and head variables */
-	int 		size;					/* The current size of current_avgwindow */
-	int 		head;					/* The current head of current_avgwindow */
+    char        uuid[37];               /* uuid with a null character */
+    double      current_cur;            /* The current value */
+    double      current_threshold;      /* The current threshold */
+    cw_t       *current_avgwindow;      /* A static yet circular buffer using size and head variables */
+    int         size;                   /* The current size of current_avgwindow */
+    int         head;                   /* The current head of current_avgwindow */
 } machine_t;
 
 typedef struct sensor {
-    char    timestamp[20];				/* Sensor timestamp */
-    double  pressure;					/* Pressure */
-    double  temperature;				/* Temperature */
-    double  humidity;					/* Humidity */
+    char    timestamp[20];              /* Sensor timestamp */
+    double  pressure;                   /* Pressure */
+    double  temperature;                /* Temperature */
+    double  humidity;                   /* Humidity */
 } sensor_t;
 
 static inline int64_t epochtime ()
