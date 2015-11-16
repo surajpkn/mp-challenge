@@ -11,7 +11,7 @@
 typedef struct current_window {
     double      current;
     int64_t     timestamp;
-} cw_t;
+} __attribute__((packed)) cw_t;
 
 typedef struct machine {
     char        uuid[37];               /* uuid with a null character */
@@ -20,14 +20,14 @@ typedef struct machine {
     cw_t       *current_avgwindow;      /* A static yet circular buffer using size and head variables */
     int         size;                   /* The current size of current_avgwindow */
     int         head;                   /* The current head of current_avgwindow */
-} machine_t;
+} __attribute__((packed)) machine_t;
 
 typedef struct sensor {
     char    timestamp[20];              /* Sensor timestamp */
     double  pressure;                   /* Pressure */
     double  temperature;                /* Temperature */
     double  humidity;                   /* Humidity */
-} sensor_t;
+} __attribute__((packed)) sensor_t;
 
 static inline int64_t epochtime ()
 {

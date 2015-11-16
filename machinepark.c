@@ -125,6 +125,7 @@ int machines_init (machine_t machines[], sensor_t *sensor)
         machines[i].current_cur = 0;
         machines[i].current_threshold = 0;
         machines[i].current_avgwindow = (cw_t *) malloc (sizeof(cw_t) * window_size);
+        memset(machines[i].current_avgwindow, 0, sizeof(cw_t) * window_size);
         machines[i].size = 0;
         machines[i].head = 0;
     }
@@ -218,13 +219,10 @@ int monitor_machine (machine_t *machine)
                 head_dup = window_size - 1;
         }
 
-        printf ("sum = %f\n", sum);
         if (count > 0)
             avg = sum / count;
         else 
             avg = machine->current_avgwindow[head_dup].current;
-
-        printf ("avg = %f\n", avg);
 
         send_alert (machine, avg);
     }
