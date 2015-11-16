@@ -15,11 +15,11 @@
 char *machine_list_url = "http://machinepark.actyx.io/api/v1/machines";
 char *env_sensor_url = "http://machinepark.actyx.io/api/v1/env-sensor";
 char *machine_detail_base_url = "http://machinepark.actyx.io/api/v1/machine/";
-
 double frequency = 0.2;	// 1/5th of a second
 double seconds_history = 300; // 5 minutes
 int window_size;
 
+/* Helper for CURL */
 typedef struct MemoryStruct {
   char *data;
   size_t size;
@@ -131,6 +131,7 @@ int machines_init (machine_t machines[], sensor_t *sensor)
 
 	/* free memory */
 	json_object_put (mlist);	
+	free (chunk.data);
 
 	rc = 0;
     return rc;
@@ -191,6 +192,10 @@ int monitor_machine (machine_t *machine)
 	machine->head = (machine->head == window_size - 1) ? 0 : machine->head + 1;
 	if (machine->size < window_size)
 		machine->size++;
+
+	/* free memory */
+	json_object_put (jdetail);
+	free (chunk.data);
 	
 	rc = 0;
 	return rc;
@@ -205,14 +210,14 @@ int monitor (machine_t machines[], sensor_t *sensor, int run_mins)
    	int rc = -1; 
 	int i = 0;	
 	int64_t timenow = epochtime ();		
-	int64_t starttime = epochtime ();
-	int64_t endtime = starttime + (run_mins * 60);
+	int64_t endtime = timenow + (run_mins * 60);
 
 	if (run_mins == 0) 
 		timenow = 0;
 
 	while (timenow < endtime) {
-		
+	
+		//printf ("Starting new iteration\n");	
 		/* monitor/operate on each machine */
 		for (i = 0; i < 243; i++) {			
 			rc = monitor_machine (&machines[i]);
@@ -247,6 +252,7 @@ int monitor (machine_t machines[], sensor_t *sensor, int run_mins)
  */
 int main (int argc, char *argv[]) 
 {
+	int i = 0;
     int run_mins = 0;
     machine_t machines[243];
     sensor_t sensor;
@@ -270,6 +276,10 @@ int main (int argc, char *argv[])
 		printf ("Failure while monitoring machines\n");
 		return -1;
 	}
+
+	/* free memory */
+	for (i = 0; i < 243; i++)
+		free (machines[i].current_avgwindow);
 
     /* Exit */
     printf ("Monitoring for stipulated time complete. Exiting...\n");

@@ -1,0 +1,22 @@
+Required Libraries
+------------------
+1. CURL 
+2. JSON C
+
+Compilation
+-----------
+Edit Makefile for setting the paths right
+
+1. To compile
+		make
+2. Clean
+		make clean
+
+Running the Program
+--------------------
+The program can be started by
+	./machinepark <minutes-to-run>
+
+minutes-to-run is the amount of minutes the program should run. 
+0 = Indefinite (and therefore can only be stopped with a signal)
+
