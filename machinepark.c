@@ -290,7 +290,7 @@ int monitor (machine_t machines[], sensor_t *sensor, int run_mins)
  *                                                     *
  *******************************************************/
 
-/* Main
+/* Main function
  */
 int main (int argc, char *argv[]) 
 {
